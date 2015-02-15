@@ -1,0 +1,107 @@
+html, body {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+header {
+  border: 5px solid white;
+  border-radius: 15px;
+  box-shadow: 0px 8px 5px 2px rgba(50, 50, 50, 0.3);
+  color: white;
+  left: 0;
+  margin: 1em auto;
+  padding: 1em;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  width: 200px;
+  z-index: 10;
+
+  -moz-box-shadow: 0px 8px 5px 2px rgba(50, 50, 50, 0.3);
+  -webkit-box-shadow: 0px 8px 5px 2px rgba(50, 50, 50, 0.3);
+}
+
+header h1 {
+  font-family: 'Chewy', cursive;
+  font-size: 4em;
+  text-shadow: 4px 4px 2px rgba(150, 150, 150, 0.5);
+}
+
+#container {
+  bottom: 2em;
+  left: 2em;
+  position: absolute;
+  right: 2em;
+  top: 4em;
+  z-index: 1;
+}
+
+#chat {
+  border: 5px solid white;
+  border-radius: 15px;
+  color: white;
+  display: block;
+  height: calc(30% - 2em - 2em - 20px);
+  overflow-y: scroll;
+  padding: 1em;
+  width: calc(100% - 2em - 10px);
+}
+
+#chat p {
+  background-color: white;
+  border-radius: 5px;
+  clear: both;
+  color: #777;
+  display: inline-block;
+  float: left;
+  font-size: 1.2em;
+  font-family: 'Chewy', cursive;
+  margin: 0.4em;
+  padding: 0.4em;
+}
+
+#chat p.client-message {
+  float: right !important;
+}
+
+#chat p span {
+  margin-right: 1em;
+}
+
+#game-canvas {
+  background: url('../assets/grass.png') repeat center center;
+  border: 5px solid white;
+  border-radius: 15px;
+  display: block;
+  height: 70%;
+  margin-bottom: 2em;
+  width: calc(100% - 10px);
+}
+
+.stripes {
+  background-size: 50px 50px; /* Controls the size of the stripes */
+
+  -moz-background-size: 50px 50px;
+  -webkit-background-size: 50px 50px;
+}
+
+.horizontal {
+  background-color: #0ae;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.5, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -moz-linear-gradient(rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -ms-linear-gradient(rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -o-linear-gradient(rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: linear-gradient(rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+}
+    
+.vertical {
+  background-color: #f90;
+  background-image: -webkit-gradient(linear, 0 0, 100% 0, color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.5, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(90deg, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -moz-linear-gradient(90deg, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -ms-linear-gradient(90deg, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: -o-linear-gradient(90deg, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, .2) 50%, transparent 50%, transparent);
+}
