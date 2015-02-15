@@ -46,7 +46,9 @@ function processConnectAction(token, name) {
     players[token] = player;
     stage.addChild(player);
 
+    var chat = $('#chat');
     $('#chat').append('<p class="client-message">' + name + ' has been connected.</p>');
+    chat.scrollTop(chat[0].scrollHeight);
   }
 }
 
