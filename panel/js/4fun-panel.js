@@ -1,22 +1,18 @@
 var stage, stageWidth, stageHeight, loader;
 var grass;
 
-/* Define the players hashmap. Key will be the token received and value the sprite */
+/* Define the players hashmap. Keys will be the token received and values the player */
 var players = {}
  
 $(function() {
 
   var ws = new WebSocket('ws://156.35.95.69:3001');
 
-  ws.onmessage = function(event) {
-    console.log(event.data);
-    processAnswer(event.data);
-  }
-
-  ws.onopen = function(event) {
-  }
-
-  init();
+  /* We'll receive actions from the server. Process each one! */
+  ws.onmessage = function(event) { processAnswer(event.data) };
+  
+  /* Initialize the game stage */
+  initializeStage();
 });
 
 function processAnswer(data) {
@@ -24,13 +20,13 @@ function processAnswer(data) {
 
   switch(data.action) {
     case 'connect':
-      processConnectAction(data.token, data.argument);
+      processConnectAction(data.token, data.name);
       break;
     case 'move':
-      processMoveAction(data.token, data.argument);
+      processMoveAction(data.token, data.direction);
       break;
     case 'say':
-      processSayAction(data.token, data.argument);
+      processSayAction(data.token, data.message);
       break;
     case 'stop':
       processStopAction(data.token);
@@ -38,6 +34,12 @@ function processAnswer(data) {
   }
 }
 
+/**
+ * Called every time a new player connects to the chat.
+ *
+ * @param {token} connection token.
+ * @param {name} name given by the player.
+ */
 function processConnectAction(token, name) {
   if (!(token in players)) {
     var player = new Player(name);
@@ -48,10 +50,22 @@ function processConnectAction(token, name) {
   }
 }
 
+/**
+ * Called on move action. Moves the player in the specified direction.
+ *
+ * @param {token} connection token.
+ * @param {direction} direction to where to move the player.
+ */
 function processMoveAction(token, direction) {
   if (token in players) { players[token].move(direction); }
 }
 
+/**
+ * Called on say action. Prints a message on the chat panel.
+ *
+ * @param {token} connection token.
+ * @param {message} message to be printed.
+ */
 function processSayAction(token, message) {
   if (token in players) {
     var chat = $('#chat');
@@ -60,17 +74,25 @@ function processSayAction(token, message) {
   }
 }
 
+/**
+ * Called when a player request to stop.
+ *
+ * @param {token} connection token.
+ */
 function processStopAction(token) {
   if (token in players) { players[token].halt(); }
 }
 
-
-function init() {
+/**
+ * Initializes the game stage.
+ */
+function initializeStage() {
   stage = new createjs.Stage('game-canvas');
 
   /* Add resize event listener to adjust images size */
-  window.addEventListener('resize', resize, false);
+  window.addEventListener('resize', resizeStage, false);
 
+  /* Load assets of the game */
   manifest = [
     { src: 'player-bald.png', id: 'player-bald' },
     { src: 'player-beard.png', id: 'player-beard' },
@@ -79,17 +101,23 @@ function init() {
 
   loader = new createjs.LoadQueue(false);
   loader.addEventListener('complete', handleComplete);
-  loader.loadManifest(manifest, true, '../assets/');
+  loader.loadManifest(manifest, true, 'assets/');
 
-  resize();
+  resizeStage();
 }
 
+/**
+ * Called once all the assets are loaded.
+ */
 function handleComplete() {
   createjs.Ticker.timingMode = createjs.Ticker.RAF;
   createjs.Ticker.addEventListener('tick', tick);
 }
 
-function resize() {
+/**
+ * Resize the stage and save dimmensions for later calculations.
+ */
+function resizeStage() {
   var canvas = document.getElementById('game-canvas');
 
   stage.canvas.height = canvas.clientHeight;
@@ -100,14 +128,22 @@ function resize() {
   stageWidth = stage.canvas.width;
 }
 
+/**
+ * Called on each tick. Update player positions here.
+ */
 function tick(event) {
   var delta = event.delta / 1000;
 
+  /* Call each player tick function */
   for (var playerToken in players) { players[playerToken].tick(delta); }
 
   stage.update(event);
 }
 
+/**
+ * Player definition. This object use an Sprite internally and defines
+ * some useful variables like player's name and velocity.
+ */
 var Player = function(name) {
   this.initialize(name);
 }
@@ -115,7 +151,12 @@ var Player = function(name) {
 Player.prototype = new createjs.Sprite();
 Player.prototype.Sprite_initialize = Player.prototype.initialize;
 
-Player.prototype.initialize = function(name, image, direction) {
+/**
+ * Initializes the player with random image and position.
+ */
+Player.prototype.initialize = function(name) {
+
+  /* Define player sprite */
   var image = ['player-bald', 'player-beard', 'player-young'][Math.floor(Math.random() * 3)]; 
   var spriteSheet = new createjs.SpriteSheet({
     images: [loader.getResult(image)],
@@ -129,54 +170,64 @@ Player.prototype.initialize = function(name, image, direction) {
   });
 
   this.constructor(spriteSheet);
+
   this.playerName = name;
   this.width = 64;
   this.height = 64;
-  this.x = Math.floor(Math.random() * stageWidth - this.width);
-  this.y = Math.floor(Math.random() * stageHeight - this.height);
+  this.x = Math.floor(Math.random() * (stageWidth - this.width));
+  this.y = Math.floor(Math.random() * (stageHeight - this.height - 50)); // -50 to avoid title panel
   this.velocity = 60;
   this.gotoAndStop(['down', 'left', 'right', 'up'][Math.floor(Math.random() * 4)]);
   this.direction = '';
 }
 
+/**
+ * Change the player direction.
+ *
+ * @param {direction} new player direction.
+ */
 Player.prototype.move = function(direction) {
   this.direction = direction;
   this.gotoAndPlay(direction);
 }
 
+/**
+ * Halts the player in the current position. Not use stop as method name. Won't work.
+ */
 Player.prototype.halt = function() {
   this.stop();
   this.direction = '';
 }
 
+/**
+ * Updates player position.
+ *
+ * @param {delta} delta value calculated on stage tick function.
+ */
 Player.prototype.tick = function(delta) {
   switch (this.direction) {
     case 'down':
       this.y += this.velocity * delta;
       if (this.y > stageHeight - this.height) {
-        this.direction = 'up';
-        this.gotoAndPlay('up');
+        this.gotoAndPlay(this.direction = 'up');
       }
       break;
     case 'left':
       this.x -= this.velocity * delta;
       if (this.x < 0) {
-        this.direction = 'right';
-        this.gotoAndPlay('right');
+        this.gotoAndPlay(this.direction = 'right');
       }
       break;
     case 'right':
       this.x += this.velocity * delta;
       if (this.x > stageWidth - this.width) {
-        this.direction = 'left';
-        this.gotoAndPlay('left');
+        this.gotoAndPlay(this.direction = 'left');
       }
       break;
     case 'up':
       this.y -= this.velocity * delta;
       if (this.y < 0) {
-        this.direction = 'down';
-        this.gotoAndPlay('down');
+        this.gotoAndPlay(this.direction = 'down');
       }
       break;
   }
