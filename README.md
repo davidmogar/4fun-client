@@ -4,7 +4,12 @@
 
 The server for this client is [available here](https://github.com/davidmogar/4fun-server). Take a look ;)
 
-## Client images
+## Structure
+The client it's divided in a website with controls to move the user player and send message to the chat, and a panel to show all players positions and messages. The next images show these sites:
+
+### Client controls
 ![Client connection](http://davidmogar.com/uploads/github/4fun/connection.png "Client connection panel")
 ![Client controls](http://davidmogar.com/uploads/github/4fun/controls.png "Client controls panel")
+
+### Players panel
 ![Players panel](http://davidmogar.com/uploads/github/4fun/panel.png "Players panel")
