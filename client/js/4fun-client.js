@@ -2,48 +2,21 @@ var url = 'http://156.35.95.69:3000/user/';
 var token;
 
 $(function() {
-  $('#down').click(function() { move('down'); });
-  $('#left').click(function() { move('left'); });
-  $('#right').click(function() { move('right'); });
-  $('#up').click(function() { move('up'); });
 
-  /* Every time an arrow is pressed, add active class to that button to show it pressed in the UI */
-  $(document).keydown(function(e) {
-    switch (e.keyCode) {
-      case 37:
-        $('#left').addClass('active');
-        break;
-      case 38:
-        $('#up').addClass('active');
-        break;
-      case 39:
-        $('#right').addClass('active');
-        break;
-      case 40:
-        $('#down').addClass('active');
-        break;
-    }
+  /* Call move function if the user clicks over an arrow button */
+  $('#down, #left, #right, #up').click(function() { move(this.id); });
+
+  /* Call move function if an arrow key is pressed or remove active class if released */
+  $(document).on('keydown keyup', function(e) {
+    var direction = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' }[event.keyCode];
+
+    if (typeof direction !== 'undefined') {
+      (event.type == 'keyup')? move(direction) : $('#' + direction).addClass('active');
+    } 
   });
 
-  /* Send a move request on arrow keyup */
-  $(document).keyup(function(e) {
-    switch (e.keyCode) {
-      case 37:
-        move('left');
-        break;
-      case 38:
-        move('up');
-        break;
-      case 39:
-        move('right');
-        break;
-      case 40:
-        move('down');
-        break;
-    }
-  });
-
-  $('#name').on('keypress', function(event) {
+  /* Send the connection request on enter */
+  $('#name').on('keyup', function(event) {
     if (event.which == 13 && !event.shiftKey) {
       var name = $('#name').val();
       if (name != '') {
@@ -57,7 +30,7 @@ $(function() {
   });
 
   /* Send message on enter */
-  $('#say').on('keypress', function(event) {
+  $('#say').on('keyup', function(event) {
     if (event.which == 13 && !event.shiftKey) {
       var sayInput = $('#say');
       $.post(url + token + '/say?message=' + sayInput.val());
@@ -66,6 +39,7 @@ $(function() {
   });
 });
 
+/* Sends an ajax request to move the player in the specified direction */
 function move(direction) {
   $.get(url + token + '/move/' + direction);
 
