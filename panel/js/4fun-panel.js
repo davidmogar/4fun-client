@@ -1,7 +1,6 @@
 var stage, stageWidth, stageHeight, loader;
-var grass;
 
-/* Define the players hashmap. Keys will be the token received and values the player */
+/* Define players hashmap. Keys will be the token received and values the player */
 var players = {}
  
 $(function() {
